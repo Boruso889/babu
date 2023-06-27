@@ -1,5 +1,6 @@
 package com.example.composerediexpress.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,9 +25,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,9 +59,8 @@ fun SplashScreen(navController: NavController) {
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-@Preview (showBackground = true)
 @Composable
-fun Onboard() {
+fun Onboard(navController: NavController) {
     val imagesList = listOf(
         R.drawable.onboard1,
         R.drawable.onboard2,
@@ -71,10 +78,16 @@ fun Onboard() {
     )
 
     val pagerState = rememberPagerState()
+    var padding by remember { mutableStateOf(50.dp) }
+    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        padding = 20.dp
+    } else {
+        padding = 50.dp
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(top = 100.dp, bottom = 70.dp)
+        .padding(vertical = padding)
         .verticalScroll(
             rememberScrollState()
         ),
@@ -97,7 +110,7 @@ fun Onboard() {
                 }
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, start = 50.dp, end = 50.dp)) {
+                    .padding(top = 10.dp, start = 50.dp, end = 50.dp, bottom = 10.dp)) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = descriptionsList[it],
@@ -107,12 +120,16 @@ fun Onboard() {
                 }
             }
         }
-        TwoButtons()
+        if (pagerState.currentPage == 2) {
+            OneButton(navController)
+        } else {
+            TwoButtons(navController)
+        }
     }
 }
 
 @Composable
-fun TwoButtons() {
+fun TwoButtons(navController: NavController) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -142,6 +159,50 @@ fun TwoButtons() {
                 fontSize = 9.38.sp,
                 fontWeight = FontWeight(700),
                 color = Color(0xFFFFFFFF))
+        }
+    }
+}
+
+@Composable
+fun OneButton(navController: NavController) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(46.dp)
+                .padding(horizontal = 24.dp)
+                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+                .clickable {
+                    navController.popBackStack()
+                    navController.navigate("SignUp")
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Sign Up",
+                fontSize = 16.sp,
+                fontWeight = FontWeight(700),
+                color = Color(0xFFFFFFFF),
+                textAlign = TextAlign.Center)
+        }
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = "Already have an account?",
+                fontSize = 14.sp,
+                color = Color(0xFFA7A7A7))
+            Text(
+                text = "Sign in",
+                fontSize = 14.sp,
+                fontWeight = FontWeight(500),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable {
+                    navController.popBackStack()
+                    navController.navigate("SignIn")
+                }
+            )
         }
     }
 }
