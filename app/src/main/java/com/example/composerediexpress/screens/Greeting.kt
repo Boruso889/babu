@@ -183,7 +183,11 @@ fun OneButton(navController: NavController) {
                 fontSize = 16.sp,
                 fontWeight = FontWeight(700),
                 color = Color(0xFFFFFFFF),
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center,
+                modifier = Modifier.clickable {
+                    navController.popBackStack()
+                    navController.navigate("SignUp")
+            })
         }
         Row(modifier = Modifier
             .fillMaxWidth()
