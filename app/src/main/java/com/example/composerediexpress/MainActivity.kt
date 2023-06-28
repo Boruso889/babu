@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.composerediexpress.screens.LogIn
 import com.example.composerediexpress.screens.Onboard
 import com.example.composerediexpress.screens.SignUp
 import com.example.composerediexpress.screens.SplashScreen
@@ -29,10 +30,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "Splash") {
+                    NavHost(navController = navController, startDestination = "LogIn") {
                         composable("Splash") { SplashScreen(navController) }
                         composable("Onboard") { Onboard(navController) }
                         composable("SignUp") { SignUp() }
+                        composable("LogIn") { LogIn() }
                     }
                 }
             }
