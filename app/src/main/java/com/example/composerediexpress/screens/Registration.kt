@@ -581,7 +581,7 @@ fun ForgotPassword(navController: NavController) {
             modifier = Modifier
                 .padding(start = 1.dp)
                 .clickable {
-                    navController.popBackStack()
+                    //navController.popBackStack()
                     navController.navigateUp()
                 })
         }

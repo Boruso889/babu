@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "Home") {
+                    NavHost(navController = navController, startDestination = "Splash") {
                         composable("Splash") { SplashScreen(navController) }
                         composable("Onboard") { Onboard(navController) }
                         composable("SignUp") { SignUp(navController) }
