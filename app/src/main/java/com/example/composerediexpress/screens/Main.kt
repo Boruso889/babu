@@ -1,11 +1,12 @@
 package com.example.composerediexpress.screens
 
-import android.widget.Space
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,14 +19,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,22 +42,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
 import com.example.composerediexpress.R
 
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview (showBackground = true)
 @Composable
-fun Home() {
-    var searchInput by remember { mutableStateOf("") }
+fun Main() {
+    val navController = rememberNavController()
+    val menuList = listOf("Home", "Wallet", "Track", "Profile")
+    var selectedItem by remember { mutableStateOf(0) }
+    Scaffold(bottomBar = {
+        NavigationBar() {
+            menuList.forEachIndexed { index, item ->
+                NavigationBarItem(selected = selectedItem == index, onClick = {
+                    selectedItem = index
 
+                    when(index) {
+                        0 -> navController.navigate("HomeNavItem") {
+                            popUpTo("HomeNavItem") {
+                                saveState = true
+                            }
+                        }
+                        1 -> navController.navigate("WalletNavItem") {
+                            popUpTo("HomeNavItem") {
+                                saveState = true
+                            }
+                        }
+                    }
+                },
+                icon = {
+                    when(index) {
+                        0 -> Icon(painterResource(id = R.drawable.nav_home), "Home")
+                        1 -> Icon(painterResource(id = R.drawable.nav_wallet), "Wallet")
+                        2 -> Icon(painterResource(id = R.drawable.nav_track), "Track")
+                        3 -> Icon(painterResource(id = R.drawable.nav_profile), "Profile")
+                    }
+                },
+                label = { Text(text = item) })
+            }
+        }
+    }
+    ) { padding ->
+        NavHost(navController = navController, startDestination = "HomeNavItem") {
+            navigation(startDestination = "Home", route = "HomeNavItem") {
+                composable("Home") { Home(padding) }
+            }
+            navigation(startDestination = "Wallet", route = "WalletNavItem") {
+                composable("Wallet") { stub(padding) }
+            }
+        }
+    }
+}
+
+@Composable
+fun stub(padding: PaddingValues) {
+    Text(text = "stub")
+    val pad = padding
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Home(padding: PaddingValues) {
+    var searchInput by remember { mutableStateOf("") }
 
     Column(
         Modifier
             .fillMaxSize()
+            .padding(padding)
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState())) {
         //Search
@@ -149,13 +214,18 @@ fun Home() {
             fontWeight = FontWeight(500),
             color = Color(0xFF0560FA),
         modifier = Modifier.padding(top = 30.dp))
-        Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, bottom = 20.dp)) {
             Row(
                 Modifier
                     .fillMaxHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Card(modifier = Modifier.weight(0.5f).height(160.dp),
+                Card(modifier = Modifier
+                    .weight(0.5f)
+                    .height(160.dp),
                     elevation = CardDefaults.cardElevation(
                         4.dp
                     )) {
@@ -180,7 +250,8 @@ fun Home() {
                 }
                 Spacer(modifier = Modifier.width(23.dp))
                 Card(modifier = Modifier
-                    .weight(0.5f).height(160.dp),
+                    .weight(0.5f)
+                    .height(160.dp),
                     elevation = CardDefaults.cardElevation(
                         4.dp
                     )) {
@@ -210,7 +281,9 @@ fun Home() {
                 Modifier
                     .fillMaxSize(),
             ) {
-                Card(modifier = Modifier.weight(0.5f).height(160.dp),
+                Card(modifier = Modifier
+                    .weight(0.5f)
+                    .height(160.dp),
                     elevation = CardDefaults.cardElevation(
                         4.dp
                     )) {
@@ -234,7 +307,9 @@ fun Home() {
                     }
                 }
                 Spacer(modifier = Modifier.width(23.dp))
-                Card(modifier = Modifier.weight(0.5f).height(160.dp),
+                Card(modifier = Modifier
+                    .weight(0.5f)
+                    .height(160.dp),
                     elevation = CardDefaults.cardElevation(
                         4.dp
                     )) {

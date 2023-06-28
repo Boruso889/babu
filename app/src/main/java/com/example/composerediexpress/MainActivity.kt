@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.composerediexpress.screens.ForgotPassword
 import com.example.composerediexpress.screens.Home
 import com.example.composerediexpress.screens.LogIn
+import com.example.composerediexpress.screens.Main
 import com.example.composerediexpress.screens.Onboard
 import com.example.composerediexpress.screens.SignUp
 import com.example.composerediexpress.screens.SplashScreen
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "Splash") {
+                    NavHost(navController = navController, startDestination = "Main") {
                         composable("Splash") { SplashScreen(navController) }
                         composable("Onboard") { Onboard(navController) }
                         composable("SignUp") { SignUp(navController) }
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         composable("ForgotPassword") { ForgotPassword(navController) }
                         composable("Verification") { Verification(navController) }
 
-                        composable("Home") { Home() }
+                        composable("Main") { Main() }
                     }
                 }
             }
