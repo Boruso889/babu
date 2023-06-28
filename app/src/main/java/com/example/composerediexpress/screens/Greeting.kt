@@ -204,7 +204,7 @@ fun OneButton(navController: NavController) {
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
                     navController.popBackStack()
-                    navController.navigate("SignIn")
+                    navController.navigate("LogIn")
                 }
             )
         }
