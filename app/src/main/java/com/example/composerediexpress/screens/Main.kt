@@ -3,6 +3,7 @@ package com.example.composerediexpress.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +61,7 @@ fun Main() {
     val navController = rememberNavController()
     val menuList = listOf("Home", "Wallet", "Track", "Profile")
     var selectedItem by remember { mutableStateOf(0) }
+
     Scaffold(bottomBar = {
         NavigationBar() {
             menuList.forEachIndexed { index, item ->
@@ -76,6 +79,7 @@ fun Main() {
                                 saveState = true
                             }
                         }
+                        3 -> navController.navigate("ProfileNavItem")
                     }
                 },
                 icon = {
@@ -97,6 +101,10 @@ fun Main() {
             }
             navigation(startDestination = "Wallet", route = "WalletNavItem") {
                 composable("Wallet") { stub(padding) }
+            }
+            //track
+            navigation(startDestination = "Profile", route = "ProfileNavItem") {
+                composable("Profile") { Profile(padding) }
             }
         }
     }
@@ -334,5 +342,222 @@ fun Home(padding: PaddingValues) {
                 }
             }
     }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Profile(padding: PaddingValues) {
+    var visibleBalance by remember { mutableStateOf(true) }
+
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = "Profile",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFFA7A7A7))
+                },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+
+            )
+        )
+    }) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)
+            .padding(padding)
+            .verticalScroll(rememberScrollState())) {
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp), elevation = CardDefaults.cardElevation(10.dp)) {}
+
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 24.dp, end = 24.dp, bottom = 10.dp, top = 36.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painterResource(id = R.drawable.avatar),
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(60.dp)
+                        )
+                        Column(modifier = Modifier.padding(start = 12.dp)) {
+                            Text(
+                                text = "Ken Nwaeze",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight(500),
+                                color = Color(0xFF3A3A3A)
+                            )
+                            Row() {
+                                Text(
+                                    text = "Current balance: ",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF3A3A3A)
+                                )
+                                if (visibleBalance) {
+                                    Text(
+                                        text = "N10,712:00",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight(500),
+                                        color = Color(0xFF0560FA)
+                                    )
+                                } else {
+                                    Text(
+                                        text = "*****",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight(500),
+                                        color = Color(0xFF0560FA))
+                                }
+                            }
+                        }
+                    }
+                    IconButton(onClick = {
+                        visibleBalance = !visibleBalance
+                    }) {
+                        if (visibleBalance) {
+                            Icon(painterResource(id = R.drawable.eye_invisible),
+                                contentDescription = "Hidden balance icon")
+                        } else {
+                            Icon(painterResource(id = R.drawable.eye_visible),
+                                contentDescription = "Hidden balance icon")
+                        }
+                    }
+                }
+                //Items
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 30.dp)) {
+                    ProfileCard(title = "Edit Profile",
+                        description = "Name, phone no, address, email ...",
+                        icon = R.drawable.nav_profile,
+                        onClick = {
+
+                        })
+                    ProfileCard(title = "Statements & Reports",
+                        description = "Download transaction details, orders, deliveries",
+                        icon = R.drawable.statements,
+                        onClick = {
+
+                        })
+                    ProfileCard(title = "Notification Settings",
+                        description = "mute, unmute, set location & tracking setting",
+                        icon = R.drawable.notification,
+                        onClick = {
+
+                        })
+                    ProfileCard(title = "Card & Bank account settings",
+                        description = "change cards, delete card details",
+                        icon = R.drawable.wallet_profile,
+                        onClick = {
+
+                        })
+                    ProfileCard(title = "Referrals",
+                        description = "check no of friends and earn",
+                        icon = R.drawable.referrals,
+                        onClick = {
+
+                        })
+                    ProfileCard(title = "About Us",
+                        description = "know more about us, terms and conditions",
+                        icon = R.drawable.about,
+                        onClick = {
+
+                        })
+                    LogOutCard(title = "Log Out",
+                        icon = R.drawable.logout,
+                        onClick = {
+
+                        })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileCard( title: String, description: String, icon: Int, onClick: () -> Unit) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(62.dp)
+        .padding(bottom = 12.dp)
+        .clickable {
+            onClick
+        },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(5.dp),
+        shape = RoundedCornerShape(0.dp)
+    ) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(painterResource(id = icon),
+                    "$title icon",
+                )
+                Column(Modifier.padding(start = 10.dp)) {
+                    Text(
+                        text = title,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF3A3A3A))
+                    Text(
+                        text = description,
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                }
+            }
+                Icon(painterResource(id = R.drawable.arrow_right_profile), title)
+        }
+    }
+}
+
+
+@Composable
+fun LogOutCard(title: String, icon: Int, onClick: () -> Unit) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(62.dp)
+        .clickable {
+            onClick
+        },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(5.dp),
+        shape = RoundedCornerShape(0.dp)
+    ) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(painterResource(id = icon),
+                    "$title icon",
+                    tint = Color(0xFFED3A3A)
+                )
+                Text(
+                    text = "Log Out",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3A3A3A),
+                modifier = Modifier.padding(start = 8.dp))
+                }
+            Icon(painterResource(id = R.drawable.arrow_right_profile), title)
+        }
     }
 }
