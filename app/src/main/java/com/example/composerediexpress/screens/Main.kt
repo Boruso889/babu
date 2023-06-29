@@ -44,9 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -104,7 +106,8 @@ fun Main() {
             }
             //track
             navigation(startDestination = "Profile", route = "ProfileNavItem") {
-                composable("Profile") { Profile(padding) }
+                composable("Profile") { Profile(padding, navController) }
+                composable("Notification") { Notification(navController, padding) }
             }
         }
     }
@@ -347,7 +350,7 @@ fun Home(padding: PaddingValues) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(padding: PaddingValues) {
+fun Profile(padding: PaddingValues, navController: NavController) {
     var visibleBalance by remember { mutableStateOf(true) }
 
     Scaffold(topBar = {
@@ -447,9 +450,9 @@ fun Profile(padding: PaddingValues) {
                         })
                     ProfileCard(title = "Notification Settings",
                         description = "mute, unmute, set location & tracking setting",
-                        icon = R.drawable.notification,
+                        icon = R.drawable.notification_menu_item,
                         onClick = {
-
+                            navController.navigate("Notification")
                         })
                     ProfileCard(title = "Card & Bank account settings",
                         description = "change cards, delete card details",
@@ -487,7 +490,7 @@ fun ProfileCard( title: String, description: String, icon: Int, onClick: () -> U
         .height(62.dp)
         .padding(bottom = 12.dp)
         .clickable {
-            onClick
+            onClick()
         },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -523,7 +526,6 @@ fun ProfileCard( title: String, description: String, icon: Int, onClick: () -> U
     }
 }
 
-
 @Composable
 fun LogOutCard(title: String, icon: Int, onClick: () -> Unit) {
     Card(modifier = Modifier
@@ -558,6 +560,55 @@ fun LogOutCard(title: String, icon: Int, onClick: () -> Unit) {
                 modifier = Modifier.padding(start = 8.dp))
                 }
             Icon(painterResource(id = R.drawable.arrow_right_profile), title)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Notification(navController: NavController, padding: PaddingValues) {
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = "Notification",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFFA7A7A7))
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    navController.navigateUp()
+                }) {
+                    Icon(painterResource(id = R.drawable.arrow_square_back),
+                        contentDescription = "Back",
+                    tint = Color(0xFF0560FA))
+                }
+            }
+        )
+    }) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)
+            .padding(padding)
+            .verticalScroll(rememberScrollState())) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp), elevation = CardDefaults.cardElevation(10.dp)
+            ) {}
+            Column(Modifier.fillMaxWidth().padding(top = 120.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(painterResource(id = R.drawable.notification),
+                    "Notification icon",
+                tint = Color(0xFFA7A7A7))
+                Text(
+                    text = "You have no notifications",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3A3A3A),
+                    textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 18.dp, start = 10.dp, end = 10.dp, bottom = 50.dp))
+            }
         }
     }
 }
