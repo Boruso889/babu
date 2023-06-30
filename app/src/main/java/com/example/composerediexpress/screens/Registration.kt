@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.composerediexpress.R
+import com.example.composerediexpress.User
 import com.example.composerediexpress.components.LargeButton
 
 fun Modifier.textField() = this.then(
@@ -248,7 +249,10 @@ fun SignUp(navController: NavController) {
             Modifier
                 .padding(top = 64.dp)
                 .clickable(checkboxState && emailValidated) {
-                    navController.navigate("LogIn")
+                    val user = User(inputName, inputPhone, inputEmail, inputPassword)
+
+                    navController.popBackStack()
+                    navController.navigate("Main")
                 }
         )
         //Text
@@ -441,7 +445,8 @@ fun LogIn(navController: NavController) {
         LargeButton(text = "Log in", modifier = Modifier
             .padding(top = 170.dp)
             .clickable(enabled = checkboxState && emailValidated) {
-                //navController.navigate()
+                navController.popBackStack()
+                navController.navigate("Main")
             })
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -581,7 +586,6 @@ fun ForgotPassword(navController: NavController) {
             modifier = Modifier
                 .padding(start = 1.dp)
                 .clickable {
-                    //navController.popBackStack()
                     navController.navigateUp()
                 })
         }

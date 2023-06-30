@@ -1,6 +1,9 @@
 package com.example.composerediexpress.screens
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.estimateAnimationDurationMillis
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,9 +29,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +50,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.composerediexpress.R
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -58,6 +66,7 @@ fun SplashScreen(navController: NavController) {
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Onboard(navController: NavController) {
@@ -120,16 +129,20 @@ fun Onboard(navController: NavController) {
                 }
             }
         }
+
         if (pagerState.currentPage == 2) {
-            OneButton(navController)
+            OneButton(navController, pagerState)
         } else {
-            TwoButtons(navController)
+            TwoButtons(navController, pagerState)
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TwoButtons(navController: NavController) {
+fun TwoButtons(navController: NavController, pagerState: PagerState) {
+    val coroutine = rememberCoroutineScope()
+
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -145,7 +158,12 @@ fun TwoButtons(navController: NavController) {
                 text = "Skip",
                 fontSize = 9.38.sp,
                 fontWeight = FontWeight(700),
-                color = MaterialTheme.colorScheme.primary)
+                color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickable {
+                coroutine.launch {
+                    pagerState.scrollToPage(2)
+                }
+            })
         }
 
         Box(modifier = Modifier
@@ -158,13 +176,22 @@ fun TwoButtons(navController: NavController) {
                 text = "Next",
                 fontSize = 9.38.sp,
                 fontWeight = FontWeight(700),
-                color = Color(0xFFFFFFFF))
+                color = Color(0xFFFFFFFF),
+            modifier = Modifier.clickable {
+                coroutine.launch {
+                    when (pagerState.currentPage) {
+                        0 -> pagerState.animateScrollToPage(1)
+                        1 -> pagerState.scrollToPage(2)
+                    }
+                }
+            })
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OneButton(navController: NavController) {
+fun OneButton(navController: NavController, pagerState: PagerState) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
