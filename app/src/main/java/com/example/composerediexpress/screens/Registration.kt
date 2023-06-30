@@ -1,6 +1,6 @@
 package com.example.composerediexpress.screens
 
-import android.util.Log
+import android.content.Context
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,13 +37,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.Navigator
 import com.example.composerediexpress.R
 import com.example.composerediexpress.User
 import com.example.composerediexpress.components.LargeButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 fun Modifier.textField() = this.then(
     Modifier
@@ -57,6 +62,7 @@ fun Modifier.textField() = this.then(
 @Composable
 fun SignUp(navController: NavController) {
     val ctx = LocalContext.current
+    val coroutine = rememberCoroutineScope()
 
     var inputName by remember { mutableStateOf("") }
     var inputPhone by remember { mutableStateOf("") }
@@ -249,7 +255,14 @@ fun SignUp(navController: NavController) {
             Modifier
                 .padding(top = 64.dp)
                 .clickable(checkboxState && emailValidated) {
-                    val user = User(inputName, inputPhone, inputEmail, inputPassword)
+                    coroutine.launch {
+                        val user = User(inputName, inputPhone, inputEmail, inputPassword)
+                        saveData(user, ctx)
+
+                        Toast
+                            .makeText(ctx, "User added", Toast.LENGTH_SHORT)
+                            .show()
+                    }
 
                     navController.popBackStack()
                     navController.navigate("Main")
@@ -296,6 +309,9 @@ fun SignUp(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogIn(navController: NavController) {
+    val ctx = LocalContext.current
+    val coroutine = rememberCoroutineScope()
+
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
 
@@ -444,9 +460,21 @@ fun LogIn(navController: NavController) {
         //Button
         LargeButton(text = "Log in", modifier = Modifier
             .padding(top = 170.dp)
-            .clickable(enabled = checkboxState && emailValidated) {
-                navController.popBackStack()
-                navController.navigate("Main")
+            .clickable(enabled = emailValidated) {
+                coroutine.launch {
+                    val listUser = getUser(inputEmail, ctx)
+                    val correctUser = getValueUser(listUser, inputPassword)
+                    if (correctUser != null) {
+                        navController.popBackStack()
+                        navController.navigate(route = "Main")
+                        //checkboxState - remember password
+                    } else {
+                        Toast
+                            .makeText(ctx, "No such user", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
             })
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -630,11 +658,79 @@ fun Verification(navController: NavController) {
             )
         }
         LargeButton(text = "Set New Password",
-            Modifier.
-                padding(top = 84.dp)
+            Modifier
+                .padding(top = 84.dp)
                 .clickable {
 
                 }
         )
     }
+}
+
+
+suspend fun saveData(user: User, ctx: Context) {
+    val filename = user.email + ".txt"
+    val string = createString(user)
+
+    withContext(Dispatchers.IO) {
+        ctx.openFileOutput(filename, Context.MODE_PRIVATE).use {
+            it.write(string.toByteArray())
+        }
+    }
+}
+
+suspend fun loadData(email: String, ctx: Context) = withContext(Dispatchers.IO) {
+    val filename = email + ".txt"
+
+    ctx.openFileInput(filename).bufferedReader().useLines { lines ->
+        lines.fold("") {acc, s ->
+            acc + s
+        }
+    }
+}
+
+fun createString(user: User): String {
+    return "{ \n" +
+            "name : ${replaceSpaceToUnderscore(user.name)}, \n" +
+            "phoneNumber : ${user.phoneNumber}, \n" +
+            "email : ${user.email}, \n" +
+            "password : ${user.password} \n" +
+            "}"
+}
+
+suspend fun getUser(email: String, ctx: Context): ArrayList<JSONObject> {
+    val files = ctx.fileList()
+    val changedEmail = email + ".txt"
+
+    val arr = ArrayList<JSONObject>()
+
+    if (files.isNotEmpty()) {
+        files.forEach {
+            if (it == changedEmail) {
+                val data = loadData(email, ctx)
+                arr.add(JSONObject(data))
+            }
+        }
+    }
+
+    return arr
+}
+
+fun replaceSpaceToUnderscore(string: String): String {
+    return string.replace(" ", "_")
+}
+
+fun replaceUnderscoreToSpace(string: String): String {
+    return string.replace("_", " ")
+}
+
+fun getValueUser(list: ArrayList<JSONObject>, password: String): JSONObject? {
+    list.forEach {
+        val gotPassword = it.get("password").toString()
+        if (gotPassword == password) {
+            return it
+        }
+    }
+
+    return null
 }
