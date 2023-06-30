@@ -41,10 +41,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.Navigator
+import com.example.composerediexpress.DataStoreManager
 import com.example.composerediexpress.R
 import com.example.composerediexpress.User
 import com.example.composerediexpress.components.LargeButton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -63,6 +65,8 @@ fun Modifier.textField() = this.then(
 fun SignUp(navController: NavController) {
     val ctx = LocalContext.current
     val coroutine = rememberCoroutineScope()
+
+    val dataStoreManager = DataStoreManager(ctx)
 
     var inputName by remember { mutableStateOf("") }
     var inputPhone by remember { mutableStateOf("") }
@@ -259,9 +263,7 @@ fun SignUp(navController: NavController) {
                         val user = User(inputName, inputPhone, inputEmail, inputPassword)
                         saveData(user, ctx)
 
-                        Toast
-                            .makeText(ctx, "User added", Toast.LENGTH_SHORT)
-                            .show()
+                        dataStoreManager.saveUserDataStore(JSONObject(createString(user)), 0)
                     }
 
                     navController.popBackStack()
@@ -308,9 +310,11 @@ fun SignUp(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogIn(navController: NavController) {
+fun LogIn(navController: NavController/*, dataStoreManager: DataStoreManager*/) {
     val ctx = LocalContext.current
     val coroutine = rememberCoroutineScope()
+
+    val dataStoreManager = DataStoreManager(ctx)
 
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
@@ -465,9 +469,12 @@ fun LogIn(navController: NavController) {
                     val listUser = getUser(inputEmail, ctx)
                     val correctUser = getValueUser(listUser, inputPassword)
                     if (correctUser != null) {
+                        var remember: Int
+                        if (checkboxState) remember = 1 else remember = 0
+                        dataStoreManager.saveUserDataStore(correctUser, remember)
+
                         navController.popBackStack()
-                        navController.navigate(route = "Main")
-                        //checkboxState - remember password
+                        navController.navigate("Main")
                     } else {
                         Toast
                             .makeText(ctx, "No such user", Toast.LENGTH_SHORT)

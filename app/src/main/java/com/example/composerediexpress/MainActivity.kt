@@ -26,6 +26,7 @@ import com.example.composerediexpress.ui.theme.ComposeRediExpressTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //val dataStoreManager = DataStoreManager(this@MainActivity)
         setContent {
             ComposeRediExpressTheme(false) {
                 // A surface container using the 'background' color from the theme
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
                         composable("Splash") { SplashScreen(navController) }
                         composable("Onboard") { Onboard(navController) }
                         composable("SignUp") { SignUp(navController) }
-                        composable("LogIn") { LogIn(navController) }
+                        composable("LogIn") { LogIn(navController/*, dataStoreManager*/) }
                         composable("ForgotPassword") { ForgotPassword(navController) }
                         composable("Verification") { Verification(navController) }
 
