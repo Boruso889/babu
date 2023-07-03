@@ -1,6 +1,7 @@
 package com.example.composerediexpress.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,29 +19,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +69,6 @@ import com.example.composerediexpress.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview (showBackground = true)
 @Composable
 fun Main() {
     val navController = rememberNavController()
@@ -99,7 +110,9 @@ fun Main() {
     ) { padding ->
         NavHost(navController = navController, startDestination = "HomeNavItem") {
             navigation(startDestination = "Home", route = "HomeNavItem") {
-                composable("Home") { Home(padding) }
+                composable("Home") { Home(padding, navController) }
+                composable("Send") { Send(padding, navController) }
+                composable("Send2") { Send2(padding, navController) }
             }
             navigation(startDestination = "Wallet", route = "WalletNavItem") {
                 composable("Wallet") { stub(padding) }
@@ -121,7 +134,7 @@ fun stub(padding: PaddingValues) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home(padding: PaddingValues) {
+fun Home(padding: PaddingValues, navController: NavController) {
     var searchInput by remember { mutableStateOf("") }
 
     Column(
@@ -234,57 +247,74 @@ fun Home(padding: PaddingValues) {
                     .fillMaxHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Card(modifier = Modifier
-                    .weight(0.5f)
-                    .height(160.dp),
+                Card(
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .height(160.dp),
                     elevation = CardDefaults.cardElevation(
                         4.dp
-                    )) {
+                    )
+                ) {
                     Column(Modifier.fillMaxWidth()) {
-                        Icon(painterResource(id = R.drawable.customer_care_icon),
+                        Icon(
+                            painterResource(id = R.drawable.customer_care_icon),
                             contentDescription = "customer care card icon",
                             modifier = Modifier.padding(start = 12.dp, top = 22.dp),
-                        tint = Color(0xFF0560FA))
+                            tint = Color(0xFF0560FA)
+                        )
                         Text(
                             text = "Customer Care",
                             fontSize = 16.sp,
                             fontWeight = FontWeight(500),
                             color = Color(0xFF0560FA),
-                            modifier = Modifier.padding(top = 12.dp, start = 12.dp, end = 12.dp))
+                            modifier = Modifier.padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                        )
                         Text(
                             text = "Our customer care service line is available from 8 -9pm week days and 9 - 5 weekends - tap to call us today",
                             fontSize = 7.45.sp,
                             color = Color(0xFF3A3A3A),
                             modifier = Modifier
-                                .padding(top = 5.dp, start = 12.dp, end = 12.dp, bottom = 40.dp))
+                                .padding(top = 5.dp, start = 12.dp, end = 12.dp, bottom = 40.dp)
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.width(23.dp))
-                Card(modifier = Modifier
+                Box(modifier = Modifier
                     .weight(0.5f)
-                    .height(160.dp),
+                    .clickable {
+                        navController.navigate("Send")
+                    }) {
+                Card(
+                    modifier = Modifier
+                        .height(160.dp),
                     elevation = CardDefaults.cardElevation(
                         4.dp
-                    )) {
+                    )
+                ) {
                     Column(Modifier.fillMaxWidth()) {
-                        Icon(painterResource(id = R.drawable.send_a_package_icon),
+                        Icon(
+                            painterResource(id = R.drawable.send_a_package_icon),
                             contentDescription = "send a package icon",
                             modifier = Modifier.padding(start = 12.dp, top = 22.dp),
-                            tint = Color(0xFF0560FA))
+                            tint = Color(0xFF0560FA)
+                        )
                         Text(
                             text = "Send a package",
                             fontSize = 16.sp,
                             fontWeight = FontWeight(500),
                             color = Color(0xFF0560FA),
-                            modifier = Modifier.padding(top = 12.dp, start = 12.dp, end = 12.dp))
+                            modifier = Modifier.padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                        )
                         Text(
                             text = "Request for a driver to pick up or deliver your package for you",
                             fontSize = 7.45.sp,
                             color = Color(0xFF3A3A3A),
                             modifier = Modifier
-                                .padding(top = 5.dp, start = 12.dp, end = 12.dp, bottom = 40.dp))
+                                .padding(top = 5.dp, start = 12.dp, end = 12.dp, bottom = 40.dp)
+                        )
                     }
                 }
+            }
             }
             Spacer(modifier = Modifier.height(24.dp))
             //Row 2
@@ -597,7 +627,10 @@ fun Notification(navController: NavController, padding: PaddingValues) {
                     .fillMaxWidth()
                     .height(1.dp), elevation = CardDefaults.cardElevation(10.dp)
             ) {}
-            Column(Modifier.fillMaxWidth().padding(top = 120.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 120.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(painterResource(id = R.drawable.notification),
                     "Notification icon",
                 tint = Color(0xFFA7A7A7))
@@ -607,8 +640,437 @@ fun Notification(navController: NavController, padding: PaddingValues) {
                     fontWeight = FontWeight(500),
                     color = Color(0xFF3A3A3A),
                     textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 18.dp, start = 10.dp, end = 10.dp, bottom = 50.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 18.dp, start = 10.dp, end = 10.dp, bottom = 50.dp))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Send(padding: PaddingValues, navController: NavController) {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Send a package",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFFA7A7A7))
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigateUp()
+                    }) {
+                        Icon(painterResource(id = R.drawable.arrow_square_back),
+                            contentDescription = "Back",
+                        tint = Color(0xFF0560FA))
+                    }
+                }
+            )
+        }
+    ) {
+        val originAddress = remember { mutableStateOf("") }
+        val originState = remember { mutableStateOf("") }
+        val originPhone = remember { mutableStateOf("") }
+        val originOther = remember { mutableStateOf("") }
+
+        val destinationAddress = remember { mutableStateOf("") }
+        val destinationState = remember { mutableStateOf("") }
+        val destinationPhone = remember { mutableStateOf("") }
+        val destinationOther = remember { mutableStateOf("") }
+
+        val packageItems = remember { mutableStateOf("") }
+        val packageWeight = remember { mutableStateOf("") }
+        val packageWorth = remember { mutableStateOf("") }
+
+        var instantSelected by remember { mutableStateOf(false) }
+
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)
+            .padding(padding)
+           ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp), elevation = CardDefaults.cardElevation(10.dp)
+            ) {}
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 24.dp, end = 24.dp, top = 43.dp)
+                    .verticalScroll(rememberScrollState())) {
+                //Origin Details
+                Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                    Icon(painterResource(id = R.drawable.origin_details),
+                        contentDescription = "Origin Details")
+                    Text(
+                        text = "Origin Details",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF3A3A3A),
+                        modifier = Modifier.padding(start = 8.dp))
+                }
+                TextFieldSend(value = originAddress, text = "Address", Color(0xFF3A3A3A))
+                TextFieldSend(value = originState, text = "State,Country", Color(0xFF3A3A3A))
+                TextFieldSend(value = originPhone, text = "Phone number", Color(0xFFA7A7A7))
+                TextFieldSend(value = originOther, text = "Others", Color(0xFFA7A7A7))
+                //Destination Details
+                Row(modifier = Modifier.padding(bottom = 5.dp, top = 39.dp)) {
+                    Icon(painterResource(id = R.drawable.destination_details),
+                        contentDescription = "Destination Details")
+                    Text(
+                        text = "Destination Details",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF3A3A3A),
+                        modifier = Modifier.padding(start = 8.dp))
+                }
+                TextFieldSend(value = destinationAddress, text = "Address", Color(0xFF3A3A3A))
+                TextFieldSend(value = destinationState, text = "State,Country", Color(0xFF3A3A3A))
+                TextFieldSend(value = destinationPhone, text = "Phone number", Color(0xFFA7A7A7))
+                TextFieldSend(value = destinationOther, text = "Others", Color(0xFFA7A7A7))
+                Row(modifier = Modifier.padding(top = 5.dp)) {
+                    Icon(painterResource(id = R.drawable.add_square),
+                        contentDescription = "Add")
+                    Text(
+                        text = "Add destination",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7),
+                      modifier = Modifier.padding(start = 6.dp))
+                }
+                //Package Details
+                Text(
+                    text = "Package Details",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3A3A3A)
+                ,modifier = Modifier.padding(top = 13.dp))
+                TextFieldSend(value = packageItems, text = "package items", Color(0xFF3A3A3A))
+                TextFieldSend(value = packageWeight, text = "Weight of item(kg)", Color(0xFF3A3A3A))
+                TextFieldSend(value = packageWorth, text = "Worth of Items", Color(0xFF3A3A3A))
+
+                Text(
+                    text = "Select delivery type",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3A3A3A),
+                    modifier = Modifier.padding(top = 39.dp))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 10.dp)) {
+                    Card(modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(75.dp)
+                        .clickable {
+                            instantSelected = !instantSelected
+                            navController.navigate("Send2")
+                        },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (instantSelected) Color(0xFF0560FA) else Color.White
+                        ),
+                    elevation = CardDefaults.cardElevation(4.dp)) {
+                        Column(Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(painterResource(id = R.drawable.clock),
+                                contentDescription = "Instant delivery",
+                            modifier = Modifier.padding(top = 13.dp),
+                            tint = if (instantSelected) Color.White else Color(0xFFA7A7A7))
+                            Text(
+                                text = "Instant delivery",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight(500),
+                                color = if (instantSelected) Color.White else Color(0xFFA7A7A7),
+                                modifier = Modifier.padding(top = 10.dp, bottom = 12.dp))
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Card(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(75.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            elevation = CardDefaults.cardElevation(4.dp)) {
+                        Column(Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(painterResource(id = R.drawable.simple_line_icons_calender),
+                                contentDescription = "Scheduled delivery",
+                                modifier = Modifier.padding(top = 13.dp),
+                            tint = Color(0xFFA7A7A7))
+                            Text(
+                                text = "Scheduled delivery",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight(500),
+                                color = Color(0xFFA7A7A7),
+                                modifier = Modifier.padding(top = 10.dp, bottom = 12.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Send2(padding: PaddingValues, navController: NavController) {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Send a package",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFFA7A7A7))
+                }
+            )
+        }
+    ) {
+        Column(Modifier.fillMaxSize().padding(it).padding(padding)) {
+            Card(modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(10.dp)) {}
+            
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 10.dp)
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )) {
+                Text(
+                    text = "Package Information",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF0560FA),
+                modifier = Modifier.padding(top = 24.dp))
+                Text(
+                    text = "Origin details",
+                    fontSize = 12.sp,
+                    color = Color(0xFF3A3A3A),
+                    modifier = Modifier.padding(top = 8.dp))
+                Text(
+                    text = "Mbaraugba, Ovom Amaa Asaa, Abia state",
+                    fontSize = 12.sp,
+                    color = Color(0xFFA7A7A7),
+                    modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    text = "+234 56543 96854",
+                    fontSize = 12.sp,
+                    color = Color(0xFFA7A7A7),
+                    modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    text = "Destination details",
+                    fontSize = 12.sp,
+                    color = Color(0xFF3A3A3A),
+                    modifier = Modifier.padding(top = 8.dp))
+                Text(
+                    text = "19 Ademola Alabi close, lagos ",
+                    fontSize = 12.sp,
+                    color = Color(0xFFA7A7A7),
+                    modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    text = "+234 70644 80655",
+                    fontSize = 12.sp,
+                    color = Color(0xFFA7A7A7),
+                    modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    text = "Other details",
+                    fontSize = 12.sp,
+                    color = Color(0xFF3A3A3A),
+                    modifier = Modifier.padding(top = 8.dp))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Package Items",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "Books ans stationary, Garri Ngwa",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Weight of items",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "1000kg",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Tracking Number",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "R-7458-4567-4434-5854",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+                Divider(modifier = Modifier.padding(top = 24.dp))
+                Text(
+                    text = "Charges",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF0560FA))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Delivery Charges",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "N2,500.00",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Instant delivery",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "N300.00",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Tax and Service Charges",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "N200.00",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+                Divider(Modifier.padding(top = 9.dp))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Package total",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA7A7A7))
+                    Text(
+                        text = "N3000.00",
+                        fontSize = 12.sp,
+                        color = Color(0xFFEC8000),
+                        textAlign = TextAlign.Right)
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 46.dp),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                    OutlinedButton(onClick = {
+
+                    },
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color(0xFF0560FA))
+                    ) {
+                        Text(
+                            text = "Edit package",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight(700),
+                            color = Color(0xFF0560FA))
+                    }
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Button(onClick = {
+                        navController.navigate("Transaction")
+                    },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0560FA),
+                    )
+                    ) {
+                        Text(
+                            text = "Make payment",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight(700),
+                            color = Color(0xFFFFFFFF))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TextFieldSend(value: MutableState<String>, text: String, textColor: Color) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp)) {
+        TextField(value = value.value, onValueChange = {
+            value.value = it
+        },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                containerColor = Color.White,
+                unfocusedBorderColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                textColor = textColor
+            ),
+            placeholder = {
+                Text(
+                    text = text,
+                    fontSize = 12.sp,
+                    color = Color(0xFFCFCFCF),
+                    lineHeight = 0.sp)
+            }
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp), elevation = CardDefaults.cardElevation(4.dp)
+        ) {}
     }
 }
