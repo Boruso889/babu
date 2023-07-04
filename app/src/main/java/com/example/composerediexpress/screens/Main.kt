@@ -1,6 +1,15 @@
 package com.example.composerediexpress.screens
 
 import android.annotation.SuppressLint
+import android.view.animation.RotateAnimation
+import androidx.compose.animation.core.DurationBasedAnimationSpec
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,6 +63,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -73,6 +83,7 @@ import com.example.composerediexpress.datastore.DataStoreManager
 import com.example.composerediexpress.datastore.DestinationDetails
 import com.example.composerediexpress.datastore.OriginDetails
 import com.example.composerediexpress.datastore.PackageDetails
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -118,10 +129,11 @@ fun Main() {
     }
     ) { padding ->
         NavHost(navController = navController, startDestination = "HomeNavItem") {
-            navigation(startDestination = "Home", route = "HomeNavItem") {
+            navigation(startDestination = "Transaction", route = "HomeNavItem") {
                 composable("Home") { Home(padding, navController) }
                 composable("Send") { Send(padding, navController) }
                 composable("Send2") { Send2(padding, navController) }
+                composable("Transaction") { Transaction(padding, navController) }
             }
             navigation(startDestination = "Wallet", route = "WalletNavItem") {
                 composable("Wallet") { stub(padding) }
@@ -1181,4 +1193,122 @@ fun TextFieldSend(value: MutableState<String>, text: String, textColor: Color) {
                 .height(1.dp), elevation = CardDefaults.cardElevation(4.dp)
         ) {}
     }
+}
+
+@Composable
+fun Transaction(padding: PaddingValues, navController: NavController) {
+    var load by remember { mutableStateOf(true) }
+    LaunchedEffect(key1 = true) {
+        delay(2000)
+        load = false
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(padding)
+        .padding(vertical = 10.dp)
+        .verticalScroll(rememberScrollState()),
+        contentAlignment = Alignment.Center) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)) {
+            if (load) TransactionLoad() else TransactionSuccess()
+            Button(modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 140.dp)
+                .height(46.dp),
+                shape = RoundedCornerShape(4.dp),
+                onClick = {
+
+            }) {
+                Text(
+                    text = "Track my item",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(700),
+                    color = Color(0xFFFFFFFF),
+                    textAlign = TextAlign.Center)
+            }
+            OutlinedButton(modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+                .height(46.dp),
+                shape = RoundedCornerShape(4.dp),
+                border = BorderStroke(1.dp, Color(0xFF0560FA)),
+                onClick = {  }) {
+                Text(
+                    text = "Go back to homepage",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(700),
+                    color = Color(0xFF0560FA),
+                    textAlign = TextAlign.Center)
+            }
+        }
+    }
+}
+
+@Composable
+fun TransactionLoad() {
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        RotationAnim()
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 130.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Your rider is on the way to your destination",
+                fontSize = 14.sp,
+                color = Color(0xFF3A3A3A))
+            Text(
+                text = "Tracking Number R-7458-4567-4434-5854",
+                fontSize = 14.sp,
+                color = Color(0xFF3A3A3A),
+                modifier = Modifier.padding(top = 8.dp))
+        }
+    }
+
+}
+
+@Composable
+fun RotationAnim() {
+    val inflateTransition = rememberInfiniteTransition()
+
+    val angle by inflateTransition.animateFloat(
+        initialValue = 720f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(2000))
+    )
+
+    Image(painterResource(id = R.drawable.load), contentDescription = "Load",
+        modifier = Modifier.size(120.dp).rotate(angle))
+}
+
+@Composable
+fun TransactionSuccess() {
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(painterResource(id = R.drawable.success), contentDescription = "Success",
+            modifier = Modifier.size(120.dp))
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 130.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Transaction Successful",
+                fontSize = 24.sp,
+                fontWeight = FontWeight(500),
+                color = Color(0xFF3A3A3A))
+            Text(
+                text = "Your rider is on the way to your destination",
+                fontSize = 14.sp,
+                color = Color(0xFF3A3A3A),
+                modifier = Modifier.padding(top = 8.dp))
+            Text(
+                text = "Tracking Number R-7458-4567-4434-5854",
+                fontSize = 14.sp,
+                color = Color(0xFF3A3A3A),
+                modifier = Modifier.padding(top = 8.dp))
+        }
+    }
+
 }
