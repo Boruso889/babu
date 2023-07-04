@@ -40,13 +40,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
-import com.example.composerediexpress.DataStoreManager
+import com.example.composerediexpress.datastore.DataStoreManager
 import com.example.composerediexpress.R
 import com.example.composerediexpress.User
 import com.example.composerediexpress.components.LargeButton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject

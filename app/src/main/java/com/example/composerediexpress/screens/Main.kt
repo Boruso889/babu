@@ -45,15 +45,18 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -66,6 +69,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.composerediexpress.R
+import com.example.composerediexpress.datastore.DataStoreManager
+import com.example.composerediexpress.datastore.DestinationDetails
+import com.example.composerediexpress.datastore.OriginDetails
+import com.example.composerediexpress.datastore.PackageDetails
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -689,6 +698,34 @@ fun Send(padding: PaddingValues, navController: NavController) {
 
         var instantSelected by remember { mutableStateOf(false) }
 
+        val coroutine = rememberCoroutineScope()
+        val ctx = LocalContext.current
+        val dataStoreManager = DataStoreManager(ctx)
+
+        LaunchedEffect(key1 = true) {
+            dataStoreManager.loadOriginDetails().collect {
+                originAddress.value = it.address
+                originState.value = it.state
+                originPhone.value = it.phoneNumber
+                originOther.value = it.other
+            }
+        }
+        LaunchedEffect(key1 = true) {
+            dataStoreManager.loadDestinationDetails().collect {
+                destinationAddress.value = it.address
+                destinationState.value = it.state
+                destinationPhone.value = it.phoneNumber
+                destinationOther.value = it.other
+            }
+        }
+        LaunchedEffect(key1 = true) {
+            dataStoreManager.loadPackageDetails().collect {
+                packageItems.value = it.items
+                packageWeight.value = it.weight
+                packageWorth.value = it.worth
+            }
+        }
+
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(it)
@@ -768,8 +805,34 @@ fun Send(padding: PaddingValues, navController: NavController) {
                         .fillMaxWidth(0.5f)
                         .height(75.dp)
                         .clickable {
-                            instantSelected = !instantSelected
-                            navController.navigate("Send2")
+                            coroutine.launch {
+                                instantSelected = !instantSelected
+
+                                val originDetails = OriginDetails(
+                                    originAddress.value,
+                                    originState.value,
+                                    originPhone.value,
+                                    originOther.value
+                                )
+                                dataStoreManager.saveOriginDetails(originDetails)
+
+                                val destinationDetails = DestinationDetails(
+                                    destinationAddress.value,
+                                    destinationState.value,
+                                    destinationPhone.value,
+                                    destinationOther.value
+                                )
+                                dataStoreManager.saveDestinationDetails(destinationDetails)
+
+                                val packageDetails = PackageDetails(
+                                    packageItems.value,
+                                    packageWeight.value,
+                                    packageWorth.value
+                                )
+                                dataStoreManager.savePackageDetails(packageDetails)
+
+                                navController.navigate("Send2")
+                            }
                         },
                         colors = CardDefaults.cardColors(
                             containerColor = if (instantSelected) Color(0xFF0560FA) else Color.White
@@ -834,7 +897,52 @@ fun Send2(padding: PaddingValues, navController: NavController) {
             )
         }
     ) {
-        Column(Modifier.fillMaxSize().padding(it).padding(padding)) {
+        val dataStoreManager = DataStoreManager(LocalContext.current)
+
+        var originAddress by remember { mutableStateOf("") }
+        var originState by remember { mutableStateOf("") }
+        var originNumber by remember { mutableStateOf("") }
+        var originOther by remember { mutableStateOf("") }
+
+        var destinationAddress by remember { mutableStateOf("") }
+        var destinationState by remember { mutableStateOf("") }
+        var destinationNumber by remember { mutableStateOf("") }
+        var destinationOther by remember { mutableStateOf("") }
+
+        var packageItems by remember { mutableStateOf("") }
+        var packageWeight by remember { mutableStateOf("") }
+        var packageWorth by remember { mutableStateOf("") }
+
+        LaunchedEffect(key1 = true) {
+            dataStoreManager.loadOriginDetails().collect {
+                originAddress = it.address
+                originState = it.state
+                originNumber = it.phoneNumber
+                originOther = it.other
+            }
+        }
+        LaunchedEffect(key1 = true) {
+            dataStoreManager.loadDestinationDetails().collect {
+                destinationAddress = it.address
+                destinationState = it.state
+                destinationNumber = it.phoneNumber
+                destinationOther = it.other
+            }
+        }
+        LaunchedEffect(key1 = true) {
+            dataStoreManager.loadPackageDetails().collect {
+                packageItems = it.items
+                packageWeight = it.weight
+                packageWorth = it.worth
+            }
+        }
+
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(padding)) {
             Card(modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth(),
@@ -860,12 +968,12 @@ fun Send2(padding: PaddingValues, navController: NavController) {
                     color = Color(0xFF3A3A3A),
                     modifier = Modifier.padding(top = 8.dp))
                 Text(
-                    text = "Mbaraugba, Ovom Amaa Asaa, Abia state",
+                    text = "$originAddress, $originState",
                     fontSize = 12.sp,
                     color = Color(0xFFA7A7A7),
                     modifier = Modifier.padding(top = 4.dp))
                 Text(
-                    text = "+234 56543 96854",
+                    text = originNumber,
                     fontSize = 12.sp,
                     color = Color(0xFFA7A7A7),
                     modifier = Modifier.padding(top = 4.dp))
@@ -875,12 +983,12 @@ fun Send2(padding: PaddingValues, navController: NavController) {
                     color = Color(0xFF3A3A3A),
                     modifier = Modifier.padding(top = 8.dp))
                 Text(
-                    text = "19 Ademola Alabi close, lagos ",
+                    text = "$destinationAddress, $destinationState",
                     fontSize = 12.sp,
                     color = Color(0xFFA7A7A7),
                     modifier = Modifier.padding(top = 4.dp))
                 Text(
-                    text = "+234 70644 80655",
+                    text = destinationNumber,
                     fontSize = 12.sp,
                     color = Color(0xFFA7A7A7),
                     modifier = Modifier.padding(top = 4.dp))
@@ -899,7 +1007,7 @@ fun Send2(padding: PaddingValues, navController: NavController) {
                         fontSize = 12.sp,
                         color = Color(0xFFA7A7A7))
                     Text(
-                        text = "Books ans stationary, Garri Ngwa",
+                        text = packageItems,
                         fontSize = 12.sp,
                         color = Color(0xFFEC8000),
                         textAlign = TextAlign.Right)
@@ -914,7 +1022,7 @@ fun Send2(padding: PaddingValues, navController: NavController) {
                         fontSize = 12.sp,
                         color = Color(0xFFA7A7A7))
                     Text(
-                        text = "1000kg",
+                        text = packageWeight,
                         fontSize = 12.sp,
                         color = Color(0xFFEC8000),
                         textAlign = TextAlign.Right)
@@ -1008,7 +1116,7 @@ fun Send2(padding: PaddingValues, navController: NavController) {
                         .padding(top = 46.dp),
                 horizontalArrangement = Arrangement.SpaceBetween) {
                     OutlinedButton(onClick = {
-
+                        navController.navigateUp()
                     },
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color(0xFF0560FA))
