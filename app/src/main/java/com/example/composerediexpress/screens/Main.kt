@@ -63,6 +63,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -103,16 +104,22 @@ fun Main() {
 
                     when(index) {
                         0 -> navController.navigate("HomeNavItem") {
-                            popUpTo("HomeNavItem") {
-                                saveState = true
-                            }
+                            popUpTo("HomeNavItem")
+                            launchSingleTop = true
+
                         }
                         1 -> navController.navigate("WalletNavItem") {
-                            popUpTo("HomeNavItem") {
-                                saveState = true
-                            }
+                            popUpTo("WalletNavItem")
+                            launchSingleTop = true
                         }
-                        3 -> navController.navigate("ProfileNavItem")
+                        2 -> navController.navigate("TrackNavItem") {
+                            popUpTo("TrackNavItem")
+                            launchSingleTop = true
+                        }
+                        3 -> navController.navigate("ProfileNavItem") {
+                            popUpTo("ProfileNavItem")
+                            launchSingleTop = true
+                        }
                     }
                 },
                 icon = {
@@ -129,28 +136,24 @@ fun Main() {
     }
     ) { padding ->
         NavHost(navController = navController, startDestination = "HomeNavItem") {
-            navigation(startDestination = "Transaction", route = "HomeNavItem") {
+            navigation(startDestination = "Home", route = "HomeNavItem") {
                 composable("Home") { Home(padding, navController) }
                 composable("Send") { Send(padding, navController) }
                 composable("Send2") { Send2(padding, navController) }
                 composable("Transaction") { Transaction(padding, navController) }
             }
             navigation(startDestination = "Wallet", route = "WalletNavItem") {
-                composable("Wallet") { stub(padding) }
+                composable("Wallet") { Wallet(padding) }
             }
-            //track
+            navigation(startDestination = "Track", route = "TrackNavItem") {
+                composable("Track") { Tracking() }
+            }
             navigation(startDestination = "Profile", route = "ProfileNavItem") {
                 composable("Profile") { Profile(padding, navController) }
                 composable("Notification") { Notification(navController, padding) }
             }
         }
     }
-}
-
-@Composable
-fun stub(padding: PaddingValues) {
-    Text(text = "stub")
-    val pad = padding
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -535,7 +538,7 @@ fun Profile(padding: PaddingValues, navController: NavController) {
 }
 
 @Composable
-fun ProfileCard( title: String, description: String, icon: Int, onClick: () -> Unit) {
+fun ProfileCard(title: String, description: String, icon: Int, onClick: () -> Unit) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .height(62.dp)
@@ -1220,7 +1223,7 @@ fun Transaction(padding: PaddingValues, navController: NavController) {
                 .height(46.dp),
                 shape = RoundedCornerShape(4.dp),
                 onClick = {
-
+                    navController.navigate("TrackNavItem")
             }) {
                 Text(
                     text = "Track my item",
@@ -1235,7 +1238,10 @@ fun Transaction(padding: PaddingValues, navController: NavController) {
                 .height(46.dp),
                 shape = RoundedCornerShape(4.dp),
                 border = BorderStroke(1.dp, Color(0xFF0560FA)),
-                onClick = {  }) {
+                onClick = {
+                    navController.popBackStack()
+                    navController.navigate("Home")
+                }) {
                 Text(
                     text = "Go back to homepage",
                     fontSize = 16.sp,
@@ -1280,7 +1286,9 @@ fun RotationAnim() {
     )
 
     Image(painterResource(id = R.drawable.load), contentDescription = "Load",
-        modifier = Modifier.size(120.dp).rotate(angle))
+        modifier = Modifier
+            .size(120.dp)
+            .rotate(angle))
 }
 
 @Composable
@@ -1311,4 +1319,175 @@ fun TransactionSuccess() {
         }
     }
 
+}
+
+@Composable
+fun Tracking() {
+    
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Wallet(padding: PaddingValues) {
+    Scaffold(topBar = {
+        TopAppBar(
+            title = {
+                Text(
+                    text = "Wallet",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFFA7A7A7))
+            }
+        )
+    }) {
+        var visibleBalance by remember { mutableStateOf(true) }
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(padding)) {
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp), elevation = CardDefaults.cardElevation(10.dp)) {}
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 24.dp, end = 24.dp, bottom = 10.dp)
+                    .verticalScroll(rememberScrollState())) {
+                Spacer(modifier = Modifier.height(36.dp))
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painterResource(id = R.drawable.avatar),
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(60.dp)
+                        )
+                        Column(modifier = Modifier.padding(start = 12.dp)) {
+                            Text(
+                                text = "Ken Nwaeze",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight(500),
+                                color = Color(0xFF3A3A3A)
+                            )
+                            Row() {
+                                Text(
+                                    text = "Current balance: ",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF3A3A3A)
+                                )
+                                if (visibleBalance) {
+                                    Text(
+                                        text = "N10,712:00",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight(500),
+                                        color = Color(0xFF0560FA)
+                                    )
+                                } else {
+                                    Text(
+                                        text = "*****",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight(500),
+                                        color = Color(0xFF0560FA))
+                                }
+                            }
+                        }
+                    }
+                    IconButton(onClick = {
+                        visibleBalance = !visibleBalance
+                    }) {
+                        if (visibleBalance) {
+                            Icon(painterResource(id = R.drawable.eye_invisible),
+                                contentDescription = "Hidden balance icon")
+                        } else {
+                            Icon(painterResource(id = R.drawable.eye_visible),
+                                contentDescription = "Hidden balance icon")
+                        }
+                    }
+                }
+                Card(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 45.dp)) {
+                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Top Up",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight(700),
+                            color = Color(0xFF3A3A3A),
+                        modifier = Modifier.padding(top = 10.dp))
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(start = 48.dp, end = 48.dp, top = 12.dp, bottom = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                            TopUpItem(text = "Bank", image = R.drawable.wallet_bank)
+                            TopUpItem(text = "Transfer", image = R.drawable.wallet_transfer)
+                            TopUpItem(text = "Card", image = R.drawable.wallet_card)
+                        }
+                    }
+                }
+                Text(
+                    text = "Transaction History",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3A3A3A),
+                modifier = Modifier.padding(top = 45.dp, bottom = 24.dp))
+
+                TransactionHistoryCard("Delivery fee", "July 7, 2022", "-N3,000.00")
+                TransactionHistoryCard("Delivery fee", "July 7, 2022", "-N2,000.00")
+                TransactionHistoryCard("Top up", "July 28, 2022", "N10,000.00")
+                TransactionHistoryCard("Delivery fee", "July 25, 2022", "-N2,000.00")
+            }
+        }
+    }
+}
+
+@Composable
+fun TopUpItem(text: String, image: Int) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(painterResource(id = image), text)
+        Text(
+            text = text,
+            fontSize = 12.sp,
+            color = Color(0xFF3A3A3A))
+    }
+}
+
+@Composable
+fun TransactionHistoryCard(title: String, date: String, sum: String) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 12.dp)
+        .clickable {
+
+        },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(5.dp),
+        shape = RoundedCornerShape(0.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.padding(vertical = 4.dp)) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3A3A3A))
+                Text(
+                    text = date,
+                    fontSize = 12.sp,
+                    color = Color(0xFFA7A7A7))
+            }
+            Text(
+                text = sum,
+                fontSize = 12.sp,
+                fontWeight = FontWeight(500),
+                color = if (sum.startsWith("-")) Color(0xFFED3A3A) else Color(0xFF35B369))
+        }
+    }
 }
