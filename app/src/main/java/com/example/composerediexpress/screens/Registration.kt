@@ -44,6 +44,11 @@ import com.example.composerediexpress.datastore.DataStoreManager
 import com.example.composerediexpress.R
 import com.example.composerediexpress.User
 import com.example.composerediexpress.components.LargeButton
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,11 +61,20 @@ fun Modifier.textField() = this.then(
     //.border(width = 1.dp, color = Color(0xFFA7A7A7), shape = RoundedCornerShape(4.dp))
 )
 
-
+val key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3" +
+        "MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2hubWF1ampxcX" +
+        "JlbGx4bnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OD" +
+        "gxMzQ1MDAsImV4cCI6MjAwMzcxMDUwMH0.O7lwQpKFos" +
+        "BFZ-OfA3Yju998YqiKDerzagPpM7Eb6j4"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp(navController: NavController) {
+    val sb = createSupabaseClient(supabaseUrl = "https://huohnmaujjqqrellxnpb.supabase.co", supabaseKey = key) {
+        install(GoTrue)
+        install(Postgrest)
+    }
+
     val ctx = LocalContext.current
     val coroutine = rememberCoroutineScope()
 
@@ -297,10 +311,16 @@ fun SignUp(navController: NavController) {
                 fontSize = 14.sp,
                 color = Color(0xFFA7A7A7),
                 textAlign = TextAlign.Center)
-            Icon(painterResource(id = R.drawable.google),
-                contentDescription = "google icon",
-                modifier = Modifier.padding(top = 8.dp),
-                tint = MaterialTheme.colorScheme.secondary)
+            IconButton(onClick = {
+
+                }) {
+                Icon(painterResource(id = R.drawable.google),
+                    contentDescription = "google icon",
+                    modifier = Modifier
+                        .padding(top = 8.dp),
+                    tint = MaterialTheme.colorScheme.secondary)
+            }
+
         }
 
     }

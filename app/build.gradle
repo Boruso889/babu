@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.21'
 }
 
 android {
@@ -80,4 +81,8 @@ dependencies {
 
     //DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    //SupaBase
+    implementation "io.github.jan-tennert.supabase:postgrest-kt:1.1.0"
+    implementation "io.ktor:ktor-client-android:2.3.2"
 }
