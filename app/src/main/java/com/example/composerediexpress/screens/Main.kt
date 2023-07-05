@@ -43,8 +43,11 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -130,7 +133,11 @@ fun Main() {
                         3 -> Icon(painterResource(id = R.drawable.nav_profile), "Profile")
                     }
                 },
-                label = { Text(text = item) })
+                label = { Text(text = item) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = MaterialTheme.colorScheme.primary
+                ))
             }
         }
     }
